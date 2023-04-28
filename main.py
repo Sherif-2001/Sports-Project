@@ -1,6 +1,8 @@
 import pygame
 
+
 pygame.font.init()
+
 
 # Constants
 FPS = 60
@@ -53,6 +55,7 @@ def main():
         clock.tick(FPS)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
