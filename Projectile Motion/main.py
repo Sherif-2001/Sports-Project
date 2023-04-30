@@ -133,12 +133,14 @@ class Projectile(pygame.sprite.Sprite):
         #it takes the last 50 elements of self.path and assigns them.
         self.path = self.path[-50:]
 
+        # Commented Code
         # draw the ball to the screen with 5 radius 
-        pygame.draw.circle(win, self.color, self.path[-1], 5)
-        ball = pygame.transform.scale_by(pygame.image.load("assets/football.png"),0.05)
-     
-        # the trail of the fire ball
-        pygame.draw.circle(win, WHITE, self.path[-1], 5, 1)
+        # pygame.draw.circle(win, self.color, self.path[-1], 5)
+        # the border of the ball
+        # pygame.draw.circle(win, WHITE, self.path[-1], 5, 1)
+        
+        ball = pygame.transform.scale(pygame.image.load("assets/football.png"),(10,10))
+        win.blit(ball,(self.path[-1][0] - ball.get_width()/2, self.path[-1][1] - ball.get_height()/2))
 
         # assign the last five small balls in same fire ball position
         for pos in self.path[:-1:5]:
