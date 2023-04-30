@@ -1,5 +1,7 @@
 import math
 
+import pygame
+
 radius = 250
 
 def toRadian(theta):
@@ -8,27 +10,16 @@ def toRadian(theta):
 def toDegrees(theta):
     return theta * 180 / math.pi
 
-def getGradient(p1, p2):
-    if p1[0] == p2[0]:
-        m = toRadian(90)
-    else:
-        m = (p2[1] - p1[1]) / (p2[0] - p1[0])
-    return m
+def angle_of_vector(x, y):
+    return pygame.math.Vector2(x, y).angle_to((1, 0))
 
-def getAngleFromGradient(gradient):
-    return math.atan(gradient)
-
-def getAngle(pos, origin):
-    m = getGradient(pos, origin)
-    thetaRad = getAngleFromGradient(m)
-    theta = round(toDegrees(thetaRad), 2)
-    return theta
-
+def getAngle(pos1, pos2):
+    return angle_of_vector(pos1[0]-pos2[0], pos1[1]-pos2[1])
 
 def getPosOnCircumeference(theta, origin):
     theta = toRadian(theta)
-    x = origin[0] + radius * math.cos(theta)
-    y = origin[1] + radius * math.sin(theta)
+    x = origin[0] + radius * math.cos(-theta)
+    y = origin[1] + radius * math.sin(-theta)
     return (x, y)
 
 def getDistanceFromOrigin(startPoint, endPoint):
