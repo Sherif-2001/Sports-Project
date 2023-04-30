@@ -1,1 +1,1 @@
-pygame.image.load("bg.jpeg")
+origin[1]
