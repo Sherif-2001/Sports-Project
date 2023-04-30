@@ -1,6 +1,6 @@
 import math
 
-radius = 160
+radius = 250
 
 def toRadian(theta):
     return theta * math.pi / 180
@@ -30,3 +30,7 @@ def getPosOnCircumeference(theta, origin):
     x = origin[0] + radius * math.cos(theta)
     y = origin[1] + radius * math.sin(theta)
     return (x, y)
+
+def getDistanceFromOrigin(startPoint, endPoint):
+    distance = math.hypot(endPoint[1] - startPoint[1],(endPoint[0] - startPoint[0]))
+    return distance
