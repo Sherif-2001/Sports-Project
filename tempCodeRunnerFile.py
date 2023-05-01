@@ -1,1 +1,2 @@
-                # # Add constraints for the arrow movement around the origin
+# Game Window Border    
+    pygame.draw.rect(WIN, WHITE, (0, 0, WIDTH, HEIGHT), 5)

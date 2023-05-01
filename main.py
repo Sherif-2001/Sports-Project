@@ -32,7 +32,7 @@ FONT = pygame.font.SysFont('verdana', 15)
 ball_image = pygame.transform.scale(pygame.image.load("assets/football.png"),(25,25))
 goal_image = pygame.transform.scale_by(pygame.image.load("assets/goal.png"),0.25)
 pitch_image = pygame.transform.scale(pygame.image.load("assets/pitch.jpg"),(WIDTH,100))
-BG = pygame.transform.scale(pygame.image.load("assets/bg.jpg"),(WIDTH,HEIGHT-100))
+bg = pygame.transform.scale(pygame.image.load("assets/bg.jpg"),(WIDTH,HEIGHT-100))
 
 # ------------------------------- Variables ---------------------------------- #
 
@@ -133,9 +133,11 @@ mouse_pos = [origin[0] + 100,origin[1] - 100]
 
 mouse_clicked = False
 
-# draw the angle arc
-arc_rect = pygame.Rect(origin[0]-30, origin[1]-30, 60, 60)
+move_ball_right = False
 
+move_ball_left = False
+
+distance_from_goal = getDistanceFromOrigin(origin, (WIDTH - 100,origin[1]))
 
 # ------------------------------- Game Loop ---------------------------------- #
 game_running = True
@@ -157,6 +159,21 @@ while game_running:
                 projectiles_group.empty()
                 current_projectile = None
 
+            # Move the ball to the right
+            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                move_ball_right = True
+                move_ball_left = False
+
+            # Move the ball to the left
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                move_ball_right = False
+                move_ball_left = True
+            
+        if event.type == pygame.KEYUP:
+                move_ball_right = False
+                move_ball_left = False
+
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_clicked = True
 
@@ -166,7 +183,7 @@ while game_running:
            # mouse up position
             mouse_up_pos = event.pos
 
-            theta = getAngle(mouse_up_pos, origin)
+            # theta = getAngle(mouse_up_pos, origin)
             if 0 <= theta < 90:
                 new_projectile = Projectile(initial_velocity, theta)
                 projectiles_group.add(new_projectile)
@@ -195,23 +212,32 @@ while game_running:
                 if distance > max_arrow_distance :
                     mouse_pos = line_end_pos
                     initial_velocity = 75
-                
-                # Change color of the arrow depending on the power
+                    
+                # Change color of the arrow depending on the power (NEVEEN TOUCH)
                 if distance < max_arrow_distance / 3:
                     arrow_color = GREEN
                 elif max_arrow_distance / 3 < distance < 2 * max_arrow_distance / 3:
                     arrow_color = YELLOW
                 else:
                     arrow_color = RED
-
+                
                 theta = getAngle(mouse_pos, origin)
                 if 0 <= theta < 90:
                     line_end_pos = getPosOnCircumeference(theta, origin)
                     arc_angle = toRadian(theta)
-    
+
+    # Move ball (origin) left and right
+    if move_ball_right and origin[0] < WIDTH - 300:
+        origin[0] += 5
+        distance_from_goal = getDistanceFromOrigin(origin, (WIDTH - 100,origin[1]))
+
+    if move_ball_left and origin[0] >= 50 :
+        origin[0] -= 5
+        distance_from_goal = getDistanceFromOrigin(origin, (WIDTH - 100,origin[1]))
+
     # Pitch and background
     WIN.blit(pitch_image,(0,HEIGHT-100))
-    WIN.blit(BG,(0,0))
+    WIN.blit(bg,(0,0))
     
     # Goal
     WIN.blit(goal_image,(WIDTH - 100, origin[1] - goal_image.get_height()/1.3))
@@ -222,18 +248,19 @@ while game_running:
     # Firing Arrow
     pygame.draw.line(WIN, arrow_color, origin, mouse_pos, 3)
 
-    # Firing Angle Arc
+    # Draw the angle arc
+    arc_rect = pygame.Rect(origin[0]-30, origin[1]-30, 60, 60)
     pygame.draw.arc(WIN, arrow_color, arc_rect, 0, arc_angle, 3)
 
     # Game Window Border    
-    pygame.draw.rect(WIN, BLACK, (0, 0, WIDTH, HEIGHT), 5)
+    pygame.draw.rect(WIN, WHITE, (0, 0, WIDTH, HEIGHT), 5)
 
     projectiles_group.update()
 
 # ------------------------------- Parameters Text ---------------------------------- #
     angle_text = FONT.render(f"Angle : {int(abs(theta))}", True, WHITE)
-    velocity_text = FONT.render(f"Velocity : {initial_velocity}m/s", True, WHITE)
-    distance_text = FONT.render("Distance : 0", True, WHITE)
+    velocity_text = FONT.render(f"Velocity : {initial_velocity} m/sec", True, WHITE)
+    distance_text = FONT.render(f"Distance : {distance_from_goal} m", True, WHITE)
     WIN.blit(angle_text, (20, 20))
     WIN.blit(velocity_text, (20, 40))
     WIN.blit(distance_text, (20, 60))
