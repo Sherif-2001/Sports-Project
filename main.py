@@ -198,11 +198,11 @@ while game_running:
 
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_clicked = False
-            ball_kick_sfx.play()
 
             # Fire a projectile (the ball)
             if 0 < theta < 90:
                 if not current_projectile or current_projectile.flying_velocity_x == 0:
+                    ball_kick_sfx.play()
                     projectiles_group.empty()
                     new_projectile = Projectile(initial_velocity, theta)
                     projectiles_group.add(new_projectile)
