@@ -33,15 +33,15 @@ PURPLE = (155,38,182)
 FONT = pygame.font.SysFont('verdana', 15)
 Goal_font = pygame.font.SysFont('verdana', 70)
 
-ball_image = pygame.transform.scale(pygame.image.load("assets/football.png"),(25,25))
-goal_image = pygame.transform.scale_by(pygame.image.load("assets/goal.png"),0.25)
-pitch_image = pygame.transform.scale(pygame.image.load("assets/pitch.jpg"),(WIDTH,100))
-bg = pygame.transform.scale(pygame.image.load("assets/bg.jpg"),(WIDTH,HEIGHT-100))
+ball_image = pygame.transform.scale(pygame.image.load("assets/images/football.png"),(25,25))
+goal_image = pygame.transform.scale_by(pygame.image.load("assets/images/goal2.png"),0.25)
+pitch_image = pygame.transform.scale(pygame.image.load("assets/images/pitch.jpg"),(WIDTH,100))
+bg = pygame.transform.scale(pygame.image.load("assets/images/bg.jpg"),(WIDTH,HEIGHT-100))
 
-whistle_sfx = pygame.mixer.Sound("assets/whistle.mp3")
-ball_kick_sfx = pygame.mixer.Sound("assets/ball_kick.mp3")
-goal_sfx = pygame.mixer.Sound("assets/goal.mp3")
-bg_music = pygame.mixer.Sound("assets/bg_music.mp3")
+whistle_sfx = pygame.mixer.Sound("assets/audio/whistle.mp3")
+ball_kick_sfx = pygame.mixer.Sound("assets/audio/ball_kick.mp3")
+goal_sfx = pygame.mixer.Sound("assets/audio/goal.mp3")
+bg_music = pygame.mixer.Sound("assets/audio/bg_music.mp3")
 bg_music.play(-1)
 # ------------------------------- Variables ---------------------------------- #
 
@@ -50,9 +50,10 @@ origin = [50, HEIGHT - 70]
 
 initial_velocity = 75
 
-goal_rect = goal_image.get_rect(left= WIDTH - 100,top =origin[1] - goal_image.get_height()/1.3)
-
 ball_rect = ball_image.get_rect()
+
+goal_rect = goal_image.get_rect()
+goal_rect.bottomleft = (WIDTH-100,origin[1] + ball_rect.centery)
 
 border_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
 
@@ -313,7 +314,6 @@ while game_running:
     change_distance_from_goal()
     draw_objects()
     
-
 # ------------------------------- Parameters Text ---------------------------------- #
     angle_text = FONT.render(f"Angle : {int(abs(theta))}", True, WHITE)
     velocity_text = FONT.render(f"Velocity : {initial_velocity} m/sec", True, WHITE)
