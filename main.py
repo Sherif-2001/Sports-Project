@@ -40,7 +40,9 @@ bg = pygame.transform.scale(pygame.image.load("assets/bg.jpg"),(WIDTH,HEIGHT-100
 
 whistle_sfx = pygame.mixer.Sound("assets/whistle.mp3")
 ball_kick_sfx = pygame.mixer.Sound("assets/ball_kick.mp3")
-
+goal_sfx = pygame.mixer.Sound("assets/goal.mp3")
+bg_music = pygame.mixer.Sound("assets/bg_music.mp3")
+bg_music.play(-1)
 # ------------------------------- Variables ---------------------------------- #
 
 # Starting fire point
@@ -74,6 +76,9 @@ class Projectile(pygame.sprite.Sprite):
         
         # horizontal distance range
         self.range = self.pos_x + abs(self.getRange())
+
+        # Height at goal
+        self.height_at_goal = 0
 
         self.path = []
    
@@ -126,12 +131,19 @@ class Projectile(pygame.sprite.Sprite):
         WIN.blit(ball_image, moving_ball_rect)
 
         if moving_ball_rect.colliderect(goal_rect):
+            # Sound effects
             whistle_sfx.play()
+            goal_sfx.play()
+
+            # Add the goal text
             win_text = Goal_font.render("GOAL", True, WHITE)
-            self.flying_velocity_x = 0
             WIN.blit(win_text, (WIDTH/2 - win_text.get_width()/2,HEIGHT/2 - win_text.get_height()/2))
+            
+            # 
+            self.flying_velocity_x = 0
             pygame.display.update()
-            pygame.time.delay(1000)
+            self.height_at_goal = self.getProjectilePos(self.pos_x - origin[0])
+            pygame.time.delay(2000)
             projectiles_group.empty()
 
         # assign the last five small balls in same fire ball position
@@ -139,7 +151,6 @@ class Projectile(pygame.sprite.Sprite):
             pygame.draw.circle(WIN, WHITE, pos, 2)
 
 # ------------------------------- Initial Values ---------------------------------- #
-
 current_projectile = None
 
 projectiles_group = pygame.sprite.Group()
@@ -161,6 +172,102 @@ mouse_clicked = False
 move_ball_left, move_ball_right = False,False
 
 distance_from_goal = getDistanceFromOrigin(origin, (WIDTH - 100,origin[1]))
+
+# ------------------------------- Input Functions ---------------------------------- #
+
+def kick_ball():
+    global current_projectile
+    if not current_projectile or current_projectile.flying_velocity_x == 0:
+        if 0 < theta < 90:
+            ball_kick_sfx.play()
+            projectiles_group.empty()
+            new_projectile = Projectile(initial_velocity, theta)
+            projectiles_group.add(new_projectile)
+            current_projectile = new_projectile
+
+def change_arrow_parameters():
+        global mouse_pos
+        global initial_velocity
+        global arrow_color
+        global line_end_pos
+        global arc_angle
+        global theta
+
+        mouse_pos = [event.pos[0],event.pos[1]]
+
+        # Add constraints for the arrow movement around the origin
+        if mouse_pos[0] < origin[0]:
+            mouse_pos[0] = origin[0]
+        if mouse_pos[1] > origin[1]:
+            mouse_pos[1] = origin[1]
+
+        # Distance from origin to the mouse position
+        distance = getDistanceFromOrigin(origin, mouse_pos)
+
+        # Max distance for the arrow
+        max_arrow_distance = getDistanceFromOrigin(origin, line_end_pos)
+
+        # Change the initial velocity depending on the arrow length
+        initial_velocity = round(75 * distance / max_arrow_distance)
+
+        # Constraint for the length of the line
+        if distance > max_arrow_distance :
+            mouse_pos = line_end_pos
+            initial_velocity = 75
+            
+        # Change color of the arrow depending on the power
+        if distance < max_arrow_distance / 3:
+            arrow_color = GREEN
+        elif max_arrow_distance / 3 < distance < 2 * max_arrow_distance / 3:
+            arrow_color = YELLOW
+        else:
+            arrow_color = RED
+        
+        theta = getAngle(mouse_pos, origin)
+        if 0 < theta < 90:
+            line_end_pos = getLineEndPos(theta, origin)
+            arc_angle = toRadian(theta)
+
+def change_distance_from_goal():
+    global distance_from_goal
+
+    if not current_projectile or current_projectile.flying_velocity_x == 0:
+        if move_ball_right and origin[0] < WIDTH - 300:
+            projectiles_group.empty()
+            origin[0] += 3
+            mouse_pos[0] += 3
+            distance_from_goal = getDistanceFromOrigin((origin[0],0), (goal_rect.left,0))
+
+        if move_ball_left and origin[0] >= 50:
+            projectiles_group.empty()
+            origin[0] -= 3
+            mouse_pos[0] -= 3
+            distance_from_goal = getDistanceFromOrigin((origin[0],0), (goal_rect.left,0))
+
+def draw_objects():
+    # Pitch and background
+    WIN.blit(pitch_image,(0,HEIGHT-100))
+    WIN.blit(bg,(0,0))
+    
+    # Goal
+    WIN.blit(goal_image, goal_rect)
+
+    # Football at origin
+    ball_rect.center = origin
+    if not current_projectile or current_projectile.flying_velocity_x == 0:
+        WIN.blit(ball_image, ball_rect)
+    
+    # Firing Arrow
+    pygame.draw.line(WIN, arrow_color, origin, mouse_pos, 3)
+
+    # Draw the angle arc
+    arc_rect = pygame.Rect(origin[0]-30, origin[1]-30, 60, 60)
+    pygame.draw.arc(WIN, arrow_color, arc_rect, 0, arc_angle, 3)
+
+    # Game Window Border    
+    pygame.draw.rect(WIN, WHITE, border_rect, 3)
+
+    projectiles_group.update()
 
 # ------------------------------- Game Loop ---------------------------------- #
 game_running = True
@@ -198,89 +305,14 @@ while game_running:
 
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_clicked = False
-
-            # Fire a projectile (the ball)
-            if 0 < theta < 90:
-                if not current_projectile or current_projectile.flying_velocity_x == 0:
-                    ball_kick_sfx.play()
-                    projectiles_group.empty()
-                    new_projectile = Projectile(initial_velocity, theta)
-                    projectiles_group.add(new_projectile)
-                    current_projectile = new_projectile
-
-        if event.type == pygame.MOUSEMOTION and mouse_clicked:
-            mouse_pos = [event.pos[0],event.pos[1]]
-
-            # Add constraints for the arrow movement around the origin
-            if mouse_pos[0] < origin[0]:
-                mouse_pos[0] = origin[0]
-            if mouse_pos[1] > origin[1]:
-                mouse_pos[1] = origin[1]
-
-            # Distance from origin to the mouse position
-            distance = getDistanceFromOrigin(origin, mouse_pos)
-
-            # Max distance for the arrow
-            max_arrow_distance = getDistanceFromOrigin(origin, line_end_pos)
-
-            # Change the initial velocity depending on the arrow length
-            initial_velocity = round(75 * distance / max_arrow_distance)
-
-            # Constraint for the length of the line
-            if distance > max_arrow_distance :
-                mouse_pos = line_end_pos
-                initial_velocity = 75
-                
-            # Change color of the arrow depending on the power
-            if distance < max_arrow_distance / 3:
-                arrow_color = GREEN
-            elif max_arrow_distance / 3 < distance < 2 * max_arrow_distance / 3:
-                arrow_color = YELLOW
-            else:
-                arrow_color = RED
+            kick_ball()
             
-            theta = getAngle(mouse_pos, origin)
-            if 0 < theta < 90:
-                line_end_pos = getLineEndPos(theta, origin)
-                arc_angle = toRadian(theta)
+        if event.type == pygame.MOUSEMOTION and mouse_clicked:
+            change_arrow_parameters()
 
-    # Change distance of origin from the goal
-    if not current_projectile or current_projectile.flying_velocity_x == 0:
-        if move_ball_right and origin[0] < WIDTH - 300:
-            projectiles_group.empty()
-            origin[0] += 3
-            mouse_pos[0] += 3
-            distance_from_goal = getDistanceFromOrigin((origin[0],0), (goal_rect.left,0))
-
-        if move_ball_left and origin[0] >= 50:
-            projectiles_group.empty()
-            origin[0] -= 3
-            mouse_pos[0] -= 3
-            distance_from_goal = getDistanceFromOrigin((origin[0],0), (goal_rect.left,0))
-
-    # Pitch and background
-    WIN.blit(pitch_image,(0,HEIGHT-100))
-    WIN.blit(bg,(0,0))
+    change_distance_from_goal()
+    draw_objects()
     
-    # Goal
-    WIN.blit(goal_image, goal_rect)
-
-    # Football at origin
-    ball_rect.center = origin
-    if not current_projectile or current_projectile.flying_velocity_x == 0:
-        WIN.blit(ball_image, ball_rect)
-    
-    # Firing Arrow
-    pygame.draw.line(WIN, arrow_color, origin, mouse_pos, 3)
-
-    # Draw the angle arc
-    arc_rect = pygame.Rect(origin[0]-30, origin[1]-30, 60, 60)
-    pygame.draw.arc(WIN, arrow_color, arc_rect, 0, arc_angle, 3)
-
-    # Game Window Border    
-    pygame.draw.rect(WIN, WHITE, border_rect, 3)
-
-    projectiles_group.update()
 
 # ------------------------------- Parameters Text ---------------------------------- #
     angle_text = FONT.render(f"Angle : {int(abs(theta))}", True, WHITE)
@@ -298,9 +330,11 @@ while game_running:
         time_of_flight_text = FONT.render(f"Time : {current_projectile.getTimeOfFlight()} s", True, WHITE)
         range_text = FONT.render(f"Range : {current_projectile.getRange()} m", True, WHITE)
         max_height_text = FONT.render(f"Max Height : {current_projectile.getMaxHeight()} m", True, WHITE)
+        height_at_goal_text = FONT.render(f"Height : {round(current_projectile.height_at_goal,2)} m", True, WHITE)
         WIN.blit(time_of_flight_text, (WIDTH-180, 20))
         WIN.blit(range_text, (WIDTH-180, 40))
         WIN.blit(max_height_text, (WIDTH-180, 60))
+        WIN.blit(height_at_goal_text, (WIDTH-180, 80))
     
     CLOCK.tick(FPS)
     pygame.display.update()
