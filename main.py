@@ -35,7 +35,7 @@ Goal_font = pygame.font.SysFont('verdana', 70)
 
 ball_image = pygame.transform.scale(pygame.image.load("assets/images/football.png"),(25,25))
 goal_image = pygame.transform.scale_by(pygame.image.load("assets/images/goal2.png"),0.25)
-pitch_image = pygame.transform.scale(pygame.image.load("assets/images/pitch.jpg"),(WIDTH,100))
+pitch_image = pygame.transform.scale(pygame.image.load("assets/images/pitch.jpg"),(WIDTH-10,100))
 bg = pygame.transform.scale(pygame.image.load("assets/images/bg.jpg"),(WIDTH,HEIGHT-100))
 
 whistle_sfx = pygame.mixer.Sound("assets/audio/whistle.mp3")
@@ -47,6 +47,9 @@ bg_music.play(-1)
 
 # Starting fire point
 origin = [50, HEIGHT - 70]
+origin_in_meter = [0,0]
+# the total width is 800 pixel which corresponds to 100 meter from start to end
+# so each pixel corresponds to 1/8 meter
 
 initial_velocity = 75
 
@@ -218,7 +221,8 @@ def change_arrow_parameters():
             mouse_pos[1] = origin[1]
 
         # Distance from origin to the mouse position
-        distance = getDistanceFromOrigin(origin, mouse_pos)
+        # * 0.0002645833
+        distance = getDistanceFromOrigin(origin, mouse_pos) 
 
         # Max distance for the arrow
         max_arrow_distance = getDistanceFromOrigin(origin, line_end_pos)
@@ -326,13 +330,17 @@ while game_running:
         if event.type == pygame.MOUSEMOTION and mouse_clicked:
             change_arrow_parameters()
 
+    print(goal_rect.height)
+
     change_distance_from_goal()
     draw_objects()
+    # *0.0002645833
+    # pitch length is 110 meter
     
 # ------------------------------- Parameters Text ---------------------------------- #
     angle_text = FONT.render(f"Angle : {int(abs(theta))}", True, WHITE)
-    velocity_text = FONT.render(f"Velocity : {initial_velocity} m/sec", True, WHITE)
-    distance_text = FONT.render(f"Distance : {distance_from_goal} m", True, WHITE)
+    velocity_text = FONT.render(f"Velocity : {round(initial_velocity * (0.4)) } m/sec", True, WHITE)
+    distance_text = FONT.render(f"Distance : {distance_from_goal *(1/8)} m", True, WHITE)
     WIN.blit(angle_text, (20, 20))
     WIN.blit(velocity_text, (20, 40))
     WIN.blit(distance_text, (20, 60))
@@ -341,10 +349,11 @@ while game_running:
     arrow_angle_text = FONT.render(f"{int(abs(theta))}°", True, WHITE)
     WIN.blit(arrow_angle_text, (origin[0]+38, origin[1]-20))
 
+    # * 0.0002645833
     if current_projectile:
         time_of_flight_text = FONT.render(f"Time : {current_projectile.getTimeOfFlight()} s", True, WHITE)
-        range_text = FONT.render(f"Range : {current_projectile.getRange()} m", True, WHITE)
-        max_height_text = FONT.render(f"Max Height : {current_projectile.getMaxHeight()} m", True, WHITE)
+        range_text = FONT.render(f"Range : {current_projectile.getRange() *(1/8) } m", True, WHITE)
+        max_height_text = FONT.render(f"Max Height : {current_projectile.getMaxHeight() / 46.4} m", True, WHITE)
         height_at_goal_text = FONT.render(f"Height : {round(current_projectile.height_at_goal,2)} m", True, WHITE)
         WIN.blit(time_of_flight_text, (WIDTH-180, 20))
         WIN.blit(range_text, (WIDTH-180, 40))
