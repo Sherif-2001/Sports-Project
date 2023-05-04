@@ -109,6 +109,31 @@ class Projectile(pygame.sprite.Sprite):
     def getProjectilePos(self, x):
         return x * math.tan(self.firing_angle) - self.getTrajectory() * x ** 2
 
+    def entered_goal(self):
+            # Sound effects
+            whistle_sfx.play()
+            goal_sfx.play()
+
+            self.flying_velocity_x = 0
+            self.height_at_goal = self.getProjectilePos(self.pos_x - origin[0])
+
+            # Add the goal text
+            win_text = Goal_font.render("GOAL", True, WHITE)
+            time_of_flight_text = FONT.render(f"Time : {current_projectile.getTimeOfFlight()} s", True, WHITE)
+            range_text = FONT.render(f"Range : {current_projectile.getRange()} m", True, WHITE)
+            max_height_text = FONT.render(f"Max Height : {current_projectile.getMaxHeight()} m", True, WHITE)
+            height_at_goal_text = FONT.render(f"Height : {round(current_projectile.height_at_goal,2)} m", True, WHITE)
+
+            WIN.blit(win_text, (WIDTH/2 - win_text.get_width()/2,HEIGHT/2 - win_text.get_height()/2))
+            WIN.blit(time_of_flight_text, (WIDTH/2 - time_of_flight_text.get_width()/2, 20))
+            WIN.blit(range_text, (WIDTH/2 - range_text.get_width()/2, 40))
+            WIN.blit(max_height_text, (WIDTH/2 - max_height_text.get_width()/2, 60))
+            WIN.blit(height_at_goal_text, (WIDTH/2 - height_at_goal_text.get_width()/2, 80))
+             
+            pygame.display.update()
+            pygame.time.delay(3000)
+            projectiles_group.empty()
+
     def update(self):
         
         # stop ball
@@ -132,20 +157,10 @@ class Projectile(pygame.sprite.Sprite):
         WIN.blit(ball_image, moving_ball_rect)
 
         if moving_ball_rect.colliderect(goal_rect):
-            # Sound effects
-            whistle_sfx.play()
-            goal_sfx.play()
-
-            # Add the goal text
-            win_text = Goal_font.render("GOAL", True, WHITE)
-            WIN.blit(win_text, (WIDTH/2 - win_text.get_width()/2,HEIGHT/2 - win_text.get_height()/2))
-            
-            # 
-            self.flying_velocity_x = 0
-            pygame.display.update()
-            self.height_at_goal = self.getProjectilePos(self.pos_x - origin[0])
-            pygame.time.delay(2000)
-            projectiles_group.empty()
+            if moving_ball_rect.y >= goal_rect.y:
+                self.entered_goal()
+            else:
+                self.flying_velocity_x = 0
 
         # assign the last five small balls in same fire ball position
         for pos in self.path[:-1:5]:
