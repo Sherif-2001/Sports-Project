@@ -36,7 +36,13 @@ The Desktop Application is built using:
 
 ## Project Demo
 
+
+https://user-images.githubusercontent.com/90320433/236676827-4efb8176-faa2-46ef-97e4-dd3649965388.mp4
+
+
 ## Screenshots
+![goal ](https://user-images.githubusercontent.com/90320433/236676806-7b139631-ccd8-47e0-8226-69c48a47d2c9.png)
+![goal missed](https://user-images.githubusercontent.com/90320433/236676812-7fec744d-bbbb-46e3-926b-dc0a77456834.png)
 
 ## Made by:
 
