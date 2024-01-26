@@ -48,11 +48,11 @@ https://user-images.githubusercontent.com/90320433/236676827-4efb8176-faa2-46ef-
 
 | Name                           | Section | BN  |
 | ------------------------------ | ------- | --- |
-| [Neven Mohammed](https://github.com/NeveenMohamed)              | 1 | 6  |
-| [Rahma]()        | 1 | 47 |
-| [Yossr]()        | 2 | 39 |
+| [Neveen Mohammed](https://github.com/NeveenMohamed)              | 1 | 6  |
+| [Rahma Abdelkader]()        | 1 | 47 |
+| [Yosur Hejy]()        | 2 | 39 |
 | [Magdy Nasr](https://github.com/MyProjectsProgress)       | 2 | 15 |
-| [Sherif](https://github.com/Sherif-2001)           | 1 | 13 |
+| [Sherif Ahmed](https://github.com/Sherif-2001)           | 1 | 13 |
 
 - Course Name : Sports Engineering .
 
