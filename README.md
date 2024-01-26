@@ -1,4 +1,4 @@
-# Soccer Foul Game
+# Projectile Simulation - Soccer Game
 
 ## Table of Contents
 
