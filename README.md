@@ -48,7 +48,7 @@ https://user-images.githubusercontent.com/90320433/236676827-4efb8176-faa2-46ef-
 
 | Name                           | Section | BN  |
 | ------------------------------ | ------- | --- |
-| [Neveen Mohammed](https://github.com/NeveenMohamed)              | 1 | 6  |
+| [Neveen Mohamed](https://github.com/NeveenMohamed)              | 2 | 6  |
 | [Rahma Abdelkader]()        | 1 | 47 |
 | [Yosur Hejy]()        | 2 | 39 |
 | [Magdy Nasr](https://github.com/MyProjectsProgress)       | 2 | 15 |
